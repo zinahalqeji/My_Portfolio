@@ -1,139 +1,287 @@
-  // Navbar
-  const sections = document.querySelectorAll("section");
-  const navLinks = document.querySelectorAll(".nav-link");
-  
-  window.addEventListener("scroll", () => {
-    let current = "";
-  
-    sections.forEach(section => {
-      const sectionTop = section.offsetTop - 150;
-      const sectionHeight = section.offsetHeight;
-      if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
-        current = section.getAttribute("id");
-      }
-    });
-  
-    navLinks.forEach(link => {
-      link.classList.remove("active");
-      if (link.getAttribute("href").includes(current)) {
-        link.classList.add("active");
-      }
-    });
+
+/* =========================================
+   NAVBAR
+========================================= */
+
+const sections = document.querySelectorAll("section");
+const navLinks = document.querySelectorAll(".nav-link");
+
+window.addEventListener("scroll", () => {
+  let current = "";
+
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop - 150;
+    const sectionHeight = section.offsetHeight;
+
+    if (
+      pageYOffset >= sectionTop &&
+      pageYOffset < sectionTop + sectionHeight
+    ) {
+      current = section.getAttribute("id");
+    }
   });
-  
-  // Animate elements on scroll
-const animatedElements = document.querySelectorAll('.animate-fade-slide');
+
+  navLinks.forEach(link => {
+    link.classList.remove("active");
+
+    if (link.getAttribute("href").includes(current)) {
+      link.classList.add("active");
+    }
+  });
+});
+
+
+/* =========================================
+   ANIMATE ELEMENTS ON SCROLL
+========================================= */
+
+const animatedElements = document.querySelectorAll(
+  ".animate-fade-slide"
+);
 
 function animateOnScroll() {
   animatedElements.forEach(el => {
     const rect = el.getBoundingClientRect();
+
     if (rect.top < window.innerHeight - 100) {
-      el.classList.add('visible');
+      el.classList.add("visible");
     }
   });
 }
 
-// Trigger on scroll and on load
-window.addEventListener('scroll', animateOnScroll);
-window.addEventListener('load', animateOnScroll);
+window.addEventListener("scroll", animateOnScroll);
+window.addEventListener("load", animateOnScroll);
 
-// Target the skills section
-const skillsSection = document.querySelector("#skills");
 
-// Function to animate bars and circles
-function animateSkills() {
-  // Animate horizontal progress bars
-  document.querySelectorAll('.progress-bar').forEach(bar => {
-    const percent = bar.style.getPropertyValue('--progress');
-    const fill = bar.querySelector('.fill') || document.createElement('div');
-    fill.classList.add('fill');
-    fill.style.background = '#00bfff';
-    fill.style.height = '100%';
-    fill.style.width = '0%';
-    fill.style.transition = 'width 2s ease-in-out';
-    if (!bar.contains(fill)) bar.appendChild(fill);
+/* =========================================
+   SKILLS ANIMATION
+   HORIZONTAL + CIRCULAR
+   MOBILE + DESKTOP
+========================================= */
 
-    setTimeout(() => {
-      fill.style.width = percent;
-    }, 100);
-  });
+const skillBars = document.querySelectorAll(
+  ".progress-bar, .radial-bar"
+);
 
-    // Animate radial (circular) progress bars slowly
-  document.querySelectorAll('.radial-bar').forEach(bar => {
-    const percent = bar.querySelector('.percentage').innerText.replace('%', '');
-    const circle = bar.querySelector('circle:nth-child(2)');
+// Prepare each bar at zero
+function prepareSkillBar(bar) {
+
+  // Horizontal progress bars
+  if (bar.classList.contains("progress-bar")) {
+    let fill = bar.querySelector(".fill");
+
+    if (!fill) {
+      fill = document.createElement("div");
+      fill.className = "fill";
+      bar.appendChild(fill);
+    }
+
+    fill.style.width = "0%";
+  }
+
+  // Circular progress bars
+  else {
+    const circle = bar.querySelector(
+      "circle:nth-child(2)"
+    );
+
+    if (!circle) return;
+
     const radius = circle.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
 
-    // Start the circle empty
-    circle.style.transition = 'none';
-    circle.style.strokeDasharray = `${circumference}`;
-    circle.style.strokeDashoffset = `${circumference}`;
+    circle.style.strokeDasharray = circumference;
+    circle.style.strokeDashoffset = circumference;
+  }
+}
 
-    // Restart the animation smoothly
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        circle.style.transition = 'stroke-dashoffset 2s linear';
 
-        const offset = circumference - (percent / 100) * circumference;
-        circle.style.strokeDashoffset = offset;
+// Animate each bar to its percentage
+function animateSkillBar(bar) {
+
+  // Horizontal progress bars
+  if (bar.classList.contains("progress-bar")) {
+    const fill = bar.querySelector(".fill");
+
+    const percent = bar.style
+      .getPropertyValue("--progress")
+      .trim();
+
+    if (!fill) return;
+
+    fill.style.width = percent;
+  }
+
+  // Circular progress bars
+  else {
+    const circle = bar.querySelector(
+      "circle:nth-child(2)"
+    );
+
+    const label = bar.querySelector(".percentage");
+
+    if (!circle || !label) return;
+
+    const percent = parseFloat(label.textContent) || 0;
+
+    const radius = circle.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+
+    const offset =
+      circumference * (1 - percent / 100);
+
+    circle.style.strokeDashoffset = offset;
+  }
+}
+
+
+// Start every skill bar empty
+skillBars.forEach(prepareSkillBar);
+
+
+// Observe bars individually
+if ("IntersectionObserver" in window) {
+
+  const skillObserver = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        const bar = entry.target;
+
+        if (entry.isIntersecting) {
+
+          // Start animation
+          bar.classList.add("skill-animate");
+
+          animateSkillBar(bar);
+
+        } else {
+
+          // Reset animation when leaving screen
+          bar.classList.remove("skill-animate");
+
+          prepareSkillBar(bar);
+        }
       });
-    });
-  });
-}
-
-// Function to reset bars and circles to 0
-function resetSkills() {
-  document.querySelectorAll('.progress-bar .fill').forEach(fill => {
-    fill.style.width = '0%';
-  });
-  document.querySelectorAll('.radial-bar circle:nth-child(2)').forEach(circle => {
-    circle.style.strokeDashoffset = circle.style.strokeDasharray;
-  });
-}
-
-// Create an Intersection Observer
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      animateSkills();
-    } else {
-      resetSkills();
+    },
+    {
+      threshold: 0,
+      rootMargin: "0px 0px -10% 0px"
     }
+  );
+
+  skillBars.forEach(bar => {
+    skillObserver.observe(bar);
   });
-}, { threshold: 0.5 });
 
-// Observe the skills section
-observer.observe(skillsSection);
+} else {
+
+  // Fallback for older browsers
+  skillBars.forEach(bar => {
+    bar.classList.add("skill-animate");
+    animateSkillBar(bar);
+  });
+
+}
 
 
+/* =========================================
+   REVEAL PROJECT CARDS
+========================================= */
 
- 
-// Reveal skill tags and project cards when scrolled into view.
 (() => {
- const cards=document.querySelectorAll('.projects-grid .project-card');
- if(!('IntersectionObserver' in window)||window.matchMedia('(prefers-reduced-motion: reduce)').matches){cards.forEach(c=>c.classList.add('in-view'));return}
- cards.forEach(c=>c.classList.add('project-reveal'));
- const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in-view');observer.unobserve(e.target)}}),{threshold:.08});
- if(panel)observer.observe(panel);cards.forEach(c=>observer.observe(c));
+  const cards = document.querySelectorAll(
+    ".projects-grid .project-card"
+  );
+
+  if (
+    !("IntersectionObserver" in window) ||
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+  ) {
+    cards.forEach(card => {
+      card.classList.add("in-view");
+    });
+    return;
+  }
+
+  cards.forEach(card => {
+    card.classList.add("project-reveal");
+  });
+
+  const observer = new IntersectionObserver(
+    entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.08
+    }
+  );
+
+  cards.forEach(card => {
+    observer.observe(card);
+  });
 })();
 
-// Accessible mobile navigation
+
+/* =========================================
+   ACCESSIBLE MOBILE NAVIGATION
+========================================= */
+
 (() => {
-  const button = document.querySelector('.menu-toggle');
-  const nav = document.querySelector('#site-navigation');
+  const button = document.querySelector(".menu-toggle");
+  const nav = document.querySelector("#site-navigation");
+
   if (!button || !nav) return;
+
   const close = () => {
-    nav.classList.remove('is-open');
-    button.setAttribute('aria-expanded','false');
-    button.setAttribute('aria-label','Open navigation menu');
+    nav.classList.remove("is-open");
+
+    button.setAttribute(
+      "aria-expanded",
+      "false"
+    );
+
+    button.setAttribute(
+      "aria-label",
+      "Open navigation menu"
+    );
   };
-  button.addEventListener('click', () => {
-    const open = nav.classList.toggle('is-open');
-    button.setAttribute('aria-expanded', String(open));
-    button.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+
+  button.addEventListener("click", () => {
+    const open = nav.classList.toggle("is-open");
+
+    button.setAttribute(
+      "aria-expanded",
+      String(open)
+    );
+
+    button.setAttribute(
+      "aria-label",
+      open
+        ? "Close navigation menu"
+        : "Open navigation menu"
+    );
   });
-  nav.querySelectorAll('a').forEach(link => link.addEventListener('click', close));
-  document.addEventListener('keydown', event => { if (event.key === 'Escape') close(); });
-  window.addEventListener('resize', () => { if (window.innerWidth > 780) close(); });
+
+  nav.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", close);
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      close();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 780) {
+      close();
+    }
+  });
 })();
