@@ -85,8 +85,7 @@ function resetSkills() {
   });
 }
 
-
-// Observe each skill bar so animation also works on mobile
+// Create an Intersection Observer
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
@@ -95,13 +94,10 @@ const observer = new IntersectionObserver((entries) => {
       resetSkills();
     }
   });
-}, { threshold: 0.1 });
+}, { threshold: 0.5 });
 
-// Observe individual bars instead of the whole Skills section
-document.querySelectorAll('.progress-bar, .radial-bar').forEach(bar => {
-  observer.observe(bar);
-});
-
+// Observe the skills section
+observer.observe(skillsSection);
 
 
 
