@@ -50,7 +50,7 @@ function animateSkills() {
     fill.style.background = '#00bfff';
     fill.style.height = '100%';
     fill.style.width = '0%';
-    fill.style.transition = 'width 2s ease-in-out';
+    fill.style.transition = 'width 5s ease-in-out';
     if (!bar.contains(fill)) bar.appendChild(fill);
 
     setTimeout(() => {
