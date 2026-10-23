@@ -879,15 +879,35 @@ section { padding: clamp(64px, 7vw, 96px) var(--page-gutter); scroll-margin-top:
 .progress-bar .fill {background:#00bfff;height:100%;border-radius:inherit;transition:width 1.6s ease-out;}
 
 
-/* Skill progress animation fix: one fill layer, no conflicting transitions. */
-.progress-bar::before { content: none; }
+
+/* Skills animation - Mobile and Desktop */
+
+.progress-bar::before {
+  content: none;
+}
+
 .progress-bar .fill {
   display: block;
+  width: 0%;
   height: 100%;
   background: #00bfff;
   border-radius: inherit;
-  transform-origin: left center;
   transition: none;
   animation: none;
 }
+
+.progress-bar.skill-animate .fill {
+  transition: width 2s linear;
+}
+
+.radial-bar circle:nth-child(2) {
+  stroke: #00bfff;
+  transition: none;
+  animation: none;
+}
+
+.radial-bar.skill-animate circle:nth-child(2) {
+  transition: stroke-dashoffset 2s linear;
+}
+
 .radial-bar circle:nth-child(2) { transition: none; animation: none; }
