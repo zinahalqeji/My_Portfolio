@@ -328,6 +328,21 @@ h2 {
     width: 100%;
   }
   
+  /* Disable the old duplicate bar */
+  .progress-bar::before {
+    content: none;
+  }
+
+/* Actual animated fill */
+  .progress-bar .fill {
+    display: block;
+    width: 0%;
+    height: 100%;
+    background: #00bfff;
+    border-radius: inherit;
+    transition: none;
+  }
+
   .progress-bar::before {
     content: "";
     position: absolute;
@@ -879,34 +894,15 @@ section { padding: clamp(64px, 7vw, 96px) var(--page-gutter); scroll-margin-top:
 .progress-bar .fill {background:#00bfff;height:100%;border-radius:inherit;transition:width 1.6s ease-out;}
 
 
-/* ==========================================
-   MOBILE-FRIENDLY SKILL BAR ANIMATION FIX
-   ========================================== */
-
-/* Disable old duplicate progress indicator */
-.progress-bar::before {
-  content: none !important;
-}
-
-/* Keep the existing bar design */
-.progress-bar {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Animated blue fill */
+/* Skill progress animation fix: one fill layer, no conflicting transitions. */
+.progress-bar::before { content: none; }
 .progress-bar .fill {
   display: block;
-  width: 0%;
   height: 100%;
   background: #00bfff;
   border-radius: inherit;
-  transition: none !important;
-  animation: none !important;
+  transform-origin: left center;
+  transition: none;
+  animation: none;
 }
-
-/* Let JavaScript control circular animations */
-.radial-bar circle:nth-child(2) {
-  transition: none !important;
-  animation: none !important;
-}
+.radial-bar circle:nth-child(2) { transition: none; animation: none; }
