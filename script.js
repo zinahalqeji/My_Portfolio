@@ -58,20 +58,27 @@ function animateSkills() {
     }, 100);
   });
 
-  // Animate radial (circular) progress bars
+    // Animate radial (circular) progress bars slowly
   document.querySelectorAll('.radial-bar').forEach(bar => {
     const percent = bar.querySelector('.percentage').innerText.replace('%', '');
     const circle = bar.querySelector('circle:nth-child(2)');
     const radius = circle.r.baseVal.value;
     const circumference = 2 * Math.PI * radius;
 
+    // Start the circle empty
+    circle.style.transition = 'none';
     circle.style.strokeDasharray = `${circumference}`;
     circle.style.strokeDashoffset = `${circumference}`;
 
-    setTimeout(() => {
-      const offset = circumference - (percent / 100) * circumference;
-      circle.style.strokeDashoffset = offset;
-    }, 200);
+    // Restart the animation smoothly
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        circle.style.transition = 'stroke-dashoffset 2s linear';
+
+        const offset = circumference - (percent / 100) * circumference;
+        circle.style.strokeDashoffset = offset;
+      });
+    });
   });
 }
 
